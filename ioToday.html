@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoToday — Monitoreo Industrial Inteligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --amber: #C87C1A;
+    --amber-light: #E8A030;
+    --amber-dim: #8A5510;
+    --bg: #080808;
+    --bg2: #0F0F0F;
+    --bg3: #161616;
+    --bg4: #1E1E1E;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(200,124,26,0.4);
+    --text: #F0EDE8;
+    --text-muted: #7A7570;
+    --text-mid: #A89F96;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,124,26,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,124,26,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 6vw;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--font-head);
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo span { color: var(--amber); }
+
+  nav ul {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  nav ul a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--amber-light); }
+
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 0.55rem 1.4rem;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-light);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    background: transparent;
+  }
+
+  .nav-cta:hover {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #000;
+  }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 1; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 10rem 6vw 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(200,124,26,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--amber);
+  }
+
+  h1 {
+    font-family: var(--font-head);
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 2rem;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--amber);
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-mid);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.85rem 2.2rem;
+    background: var(--amber);
+    color: #000;
+    font-weight: 400;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--amber-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.85rem 2.2rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+
+  /* Stat bar */
+  .hero-stats {
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    max-width: 700px;
+  }
+
+  .stat-item {
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--amber-light);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  /* CLIENT SECTION */
+  .client-section {
+    padding: 6rem 6vw;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .client-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--amber);
+  }
+
+  h2 {
+    font-family: var(--font-head);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+  }
+
+  h2 em {
+    font-style: normal;
+    color: var(--amber);
+  }
+
+  .body-text {
+    color: var(--text-mid);
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 1.2rem;
+  }
+
+  /* Problem cards */
+  .problem-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .problem-card {
+    background: var(--bg2);
+    padding: 1.5rem 1.8rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    transition: background 0.2s;
+  }
+
+  .problem-card:hover { background: var(--bg3); }
+
+  .prob-icon {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--amber);
+    background: rgba(200,124,26,0.1);
+    border: 1px solid rgba(200,124,26,0.2);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .prob-title {
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  .prob-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* SOLUTION */
+  .solution-section {
+    padding: 7rem 6vw;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .solution-header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 5rem;
+  }
+
+  .solution-header .section-eyebrow {
+    justify-content: center;
+  }
+
+  .solution-header .section-eyebrow::before { display: none; }
+
+  .solution-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .sol-card {
+    background: var(--bg);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s;
+  }
+
+  .sol-card:hover { background: var(--bg3); }
+
+  .sol-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--amber);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .sol-card:hover::after { opacity: 1; }
+
+  .sol-number {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--amber-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+  }
+
+  .sol-title {
+    font-family: var(--font-head);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.01em;
+  }
+
+  .sol-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 7rem 6vw;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+
+  .how-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .how-header {
+    max-width: 500px;
+    margin-bottom: 4rem;
+  }
+
+  .steps-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .steps-container::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber-dim), var(--amber-dim), transparent);
+    z-index: 0;
+  }
+
+  .step {
+    position: relative;
+    z-index: 1;
+    padding: 0 1rem;
+    text-align: center;
+  }
+
+  .step-num {
+    width: 48px;
+    height: 48px;
+    background: var(--bg3);
+    border: 1px solid var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--amber);
+  }
+
+  .step-title {
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* FLOW DIAGRAM */
+  .flow-section {
+    padding: 5rem 6vw;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .flow-diagram {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .flow-node {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .flow-node.accent {
+    border-color: rgba(200,124,26,0.3);
+    background: rgba(200,124,26,0.05);
+  }
+
+  .flow-node-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .flow-node-title {
+    font-family: var(--font-head);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .flow-arrow {
+    color: var(--amber-dim);
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+
+  /* QUOTE */
+  .quote-section {
+    padding: 5rem 6vw;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .big-quote {
+    font-family: var(--font-head);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text);
+    max-width: 820px;
+    margin: 0 auto;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+  }
+
+  .big-quote em {
+    font-style: normal;
+    color: var(--amber);
+  }
+
+  .quote-source {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* WHY US */
+  .why-section {
+    padding: 7rem 6vw;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .why-header {
+    max-width: 500px;
+    margin-bottom: 4rem;
+  }
+
+  .differentials {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .diff-card {
+    background: var(--bg);
+    padding: 2.2rem;
+    transition: background 0.2s;
+  }
+
+  .diff-card:hover { background: var(--bg3); }
+
+  .diff-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgba(200,124,26,0.25);
+    background: rgba(200,124,26,0.07);
+    display: inline-block;
+  }
+
+  .diff-title {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.7rem;
+    letter-spacing: -0.01em;
+  }
+
+  .diff-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* RISK CALLOUT */
+  .risk-section {
+    padding: 4rem 6vw;
+    background: rgba(200,124,26,0.04);
+    border-top: 1px solid rgba(200,124,26,0.15);
+    border-bottom: 1px solid rgba(200,124,26,0.15);
+  }
+
+  .risk-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    gap: 5rem;
+    align-items: flex-start;
+  }
+
+  .risk-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    padding-top: 0.2rem;
+  }
+
+  .risk-text {
+    font-family: var(--font-head);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  .risk-amount {
+    color: #E8A030;
+    font-size: 1.6rem;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 8rem 6vw;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(200,124,26,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .cta-section .body-text {
+    max-width: 480px;
+    margin: 0 auto 3rem;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 6vw;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-logo {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .footer-logo span { color: var(--amber); }
+
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { border-color: rgba(200,124,26,0.2); }
+    50% { border-color: rgba(200,124,26,0.6); }
+  }
+
+  .hero-inner > * {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .hero-tag { animation-delay: 0.1s; }
+  h1 { animation-delay: 0.2s; }
+  .hero-sub { animation-delay: 0.35s; }
+  .hero-actions { animation-delay: 0.5s; }
+  .hero-stats { animation-delay: 0.65s; }
+
+  .step-num { animation: pulse-border 3s ease-in-out infinite; }
+
+  /* Scrolled-in reveals */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Live indicator */
+  .live-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #3DBA7B;
+    border-radius: 50%;
+    margin-right: 6px;
+    position: relative;
+  }
+
+  .live-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid #3DBA7B;
+    animation: ping 1.5s ease infinite;
+  }
+
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Code snippet */
+  .code-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber-dim);
+    padding: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-mid);
+    line-height: 1.9;
+    margin-top: 2rem;
+    overflow-x: auto;
+  }
+
+  .code-block .kw { color: var(--amber); }
+  .code-block .str { color: #7FB980; }
+  .code-block .cm { color: var(--text-muted); font-style: italic; }
+  .code-block .fn { color: #7EB8D4; }
+
+  @media (max-width: 900px) {
+    nav ul { display: none; }
+    .client-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .solution-grid { grid-template-columns: 1fr; }
+    .steps-container { grid-template-columns: 1fr; }
+    .steps-container::before { display: none; }
+    .differentials { grid-template-columns: 1fr; }
+    .flow-diagram { grid-template-columns: 1fr; }
+    .flow-arrow { transform: rotate(90deg); }
+    .hero-stats { grid-template-columns: 1fr; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .risk-inner { flex-direction: column; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Io<span>Today</span></a>
+  <ul>
+    <li><a href="#problema">Problema</a></li>
+    <li><a href="#solucion">Solución</a></li>
+    <li><a href="#como">Proceso</a></li>
+    <li><a href="#diferencial">Por qué nosotros</a></li>
+  </ul>
+  <a href="#contacto" class="nav-cta">Contactar</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">
+      <span class="live-dot"></span> Monitoreo IoT en tiempo real
+    </div>
+    <h1>Tu equipamiento<br>trabaja.<br>Nosotros <em>lo vigilamos.</em></h1>
+    <p class="hero-sub">
+      Conectamos sensores inteligentes a tu heladeras, climatizadores y equipos críticos — sin reemplazar nada. Alertas automáticas antes de que el problema escale.
+    </p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-primary">Solicitar diagnóstico gratuito</a>
+      <a href="#como" class="btn-ghost">Ver cómo funciona</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">40–70%</div>
+        <div class="stat-label">menos costo vs. reemplazar equipo</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">15–25%</div>
+        <div class="stat-label">reducción consumo energético</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">monitoreo sin intervención humana</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="client-section" id="problema">
+  <div class="client-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">El escenario actual</div>
+      <h2>¿Cuánto te cuesta <em>no saber</em> lo que pasa en tu hotel?</h2>
+      <p class="body-text">
+        Hoteles como el tuyo operan con sistemas que funcionan — pero sin datos. Una heladera que falla a las 3am no le avisa a nadie. La climatización se regula a ojo. Los registros son papel.
+      </p>
+      <p class="body-text">
+        Cuando el problema se detecta, el daño ya está hecho.
+      </p>
+      <div class="code-block">
+        <span class="cm">// Sin IoToday: detección tardía</span><br>
+        06:00am → Empleado llega al turno<br>
+        06:15am → <span class="kw">DESCUBRE</span> heladera averiada<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Temperatura: <span class="str">14°C desde las 02:00am</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Stock perdido: <span class="kw">$1.500.000</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Daño: <span class="kw">irreversible</span>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="problem-cards">
+        <div class="problem-card">
+          <div class="prob-icon">01</div>
+          <div>
+            <div class="prob-title">Control sin visibilidad</div>
+            <div class="prob-desc">Cada empleado regula temperatura manualmente, anota en papel y reporta fallas cuando ya ocurrieron. Sin trazabilidad.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="prob-icon">02</div>
+          <div>
+            <div class="prob-title">Fallas nocturnas sin alertas</div>
+            <div class="prob-desc">Si una heladera industrial sube de temperatura a las 3am, nadie lo sabe hasta el turno siguiente. El daño ya es un hecho.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="prob-icon">03</div>
+          <div>
+            <div class="prob-title">Riesgo sanitario y económico</div>
+            <div class="prob-desc">Pérdida de stock alimentario, reclamos de huéspedes por climatización inconsistente y posibles multas sanitarias.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="prob-icon">04</div>
+          <div>
+            <div class="prob-title">Consumo energético invisible</div>
+            <div class="prob-desc">Sin datos de consumo, no hay forma de optimizar. El gasto energético se dispara sin que nadie lo note ni pueda intervenir.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE / RIESGO -->
+<div class="risk-section">
+  <div class="risk-inner">
+    <div class="risk-label">/ alerta económica</div>
+    <div class="risk-text">
+      Un hotel puede perder entre <span class="risk-amount">$1.000.000 y $2.000.000 en mercadería</span> por noche cuando una heladera falla sin que nadie lo detecte a tiempo.
+    </div>
+  </div>
+</div>
+
+<!-- SOLUCIÓN -->
+<section style="padding: 7rem 0;" id="solucion">
+  <div class="solution-section" style="padding-top: 0; padding-bottom: 0;">
+    <div class="solution-header reveal">
+      <div class="section-eyebrow">Nuestra solución</div>
+      <h2>Inteligencia encima de lo que <em>ya tenés</em></h2>
+      <p class="body-text">Sin reemplazar equipos. Sin interrumpir la operación. Solo conectividad e inteligencia sobre tu infraestructura existente.</p>
+    </div>
+    <div class="solution-grid reveal">
+      <div class="sol-card">
+        <div class="sol-number">01 / Sensores</div>
+        <div class="sol-title">Monitoreo de temperatura y humedad</div>
+        <div class="sol-desc">Sensores instalados en heladeras industriales, cámaras frigoríficas y climatizadores. Medición cada 5 minutos sin interrumpir la operación del equipo.</div>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">02 / Dashboard</div>
+        <div class="sol-title">Dashboard centralizado en la nube</div>
+        <div class="sol-desc">Desde tu celular o computadora, accedés en tiempo real al estado de cada equipo. Semáforo de colores, histórico de lecturas y reportes automáticos.</div>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">03 / Alertas</div>
+        <div class="sol-title">Alertas automáticas por WhatsApp y SMS</div>
+        <div class="sol-desc">Si la temperatura supera el umbral configurado, el sistema notifica al encargado en segundos. Cada alerta incluye el equipo, el valor y la hora exacta.</div>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">04 / Energía</div>
+        <div class="sol-title">Reportes de consumo energético</div>
+        <div class="sol-desc">Identificamos consumos anómalos y picos de demanda. Con estos datos, podés reducir entre 15–25% el gasto energético mensual sin cambiar ningún equipo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW DIAGRAM -->
+<section class="flow-section reveal">
+  <div class="section-eyebrow">Arquitectura técnica</div>
+  <h2>Cómo <em>fluye</em> la información</h2>
+  <div class="flow-diagram">
+    <div class="flow-node accent">
+      <div class="flow-node-label">Sensor</div>
+      <div class="flow-node-title">Temperatura / Humedad / Consumo</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">
+      <div class="flow-node-label">MQTT</div>
+      <div class="flow-node-title">Gateway IoT</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">
+      <div class="flow-node-label">Node-RED</div>
+      <div class="flow-node-title">Procesamiento de reglas</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node accent">
+      <div class="flow-node-label">Grafana + AWS</div>
+      <div class="flow-node-title">Dashboard + Alertas</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="como">
+  <div class="how-inner">
+    <div class="how-header reveal">
+      <div class="section-eyebrow">El proceso</div>
+      <h2>De cero a monitoreo <em>en 5 pasos</em></h2>
+    </div>
+    <div class="steps-container">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Relevamiento</div>
+        <div class="step-desc">Visitamos las instalaciones y mapeamos todos los equipos críticos a monitorear.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div class="step-title">Diseño</div>
+        <div class="step-desc">Seleccionamos sensores compatibles y definimos la arquitectura de conectividad.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div class="step-title">Instalación</div>
+        <div class="step-desc">Montamos los sensores sin cortar la operación. El hotel sigue funcionando.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div class="step-title">Capacitación</div>
+        <div class="step-desc">Entrenamos al personal en el uso del dashboard y configuramos las alertas.</div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">05</div>
+        <div class="step-title">Soporte</div>
+        <div class="step-desc">Monitoreo remoto continuo y reportes periódicos de rendimiento del sistema.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-section">
+  <div class="big-quote reveal">
+    "No hace falta comprar maquinaria nueva para competir. <em>Hace falta conectar lo que ya tenés.</em>"
+  </div>
+  <div class="quote-source reveal">— IoToday / filosofía de implementación</div>
+</div>
+
+<!-- POR QUÉ ELEGIRNOS -->
+<section class="why-section" id="diferencial">
+  <div class="why-header reveal">
+    <div class="section-eyebrow">Diferencial</div>
+    <h2>Por qué <em>IoToday</em></h2>
+  </div>
+  <div class="differentials reveal">
+    <div class="diff-card">
+      <div class="diff-tag">No reemplazamos</div>
+      <div class="diff-title">Conectamos lo que ya existe</div>
+      <div class="diff-desc">Ahorrás entre 40 y 70% del costo en comparación con cambiar el equipamiento completo. Nada se tira; todo se potencia.</div>
+    </div>
+    <div class="diff-card">
+      <div class="diff-tag">Operación continua</div>
+      <div class="diff-title">Instalación sin downtime</div>
+      <div class="diff-desc">Implementamos mientras el hotel sigue funcionando. No hay cortes, no hay interrupciones, no hay pérdida de ingresos durante la instalación.</div>
+    </div>
+    <div class="diff-card">
+      <div class="diff-tag">A medida</div>
+      <div class="diff-title">Solución para tu equipamiento</div>
+      <div class="diff-desc">No vendemos un producto plantilla. Analizamos tu infraestructura específica y diseñamos la integración pensada para tus equipos y tu operación.</div>
+    </div>
+    <div class="diff-card">
+      <div class="diff-tag">ROI medible</div>
+      <div class="diff-title">Impacto económico visible</div>
+      <div class="diff-desc">Detección temprana que previene pérdidas de +$1M por evento. Reducción del consumo energético de 15–25%. Números reales, no estimaciones.</div>
+    </div>
+    <div class="diff-card">
+      <div class="diff-tag">Escalable</div>
+      <div class="diff-title">Crece con tu operación</div>
+      <div class="diff-desc">Empezás con una sucursal y escala sin cambiar la arquitectura. AWS IoT Core soporta millones de dispositivos. Tu inversión crece con vos.</div>
+    </div>
+    <div class="diff-card">
+      <div class="diff-tag">24/7</div>
+      <div class="diff-title">Automatizamos el control</div>
+      <div class="diff-desc">Tus empleados dejan de hacer rondas manuales. El sistema monitorea todo el tiempo y solo interrumpe cuando hay algo que atender.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contacto">
+  <div class="cta-glow"></div>
+  <div class="section-eyebrow" style="justify-content: center; margin-bottom: 1.5rem;">
+    <span style="color: var(--amber); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;">/ siguiente paso</span>
+  </div>
+  <h2 class="reveal">¿Cuánto perdés<br>sin <em>saberlo</em>?</h2>
+  <p class="body-text reveal">
+    Te hacemos un diagnóstico gratuito de tu equipamiento actual. Sin compromiso. En menos de 48hs tenés un análisis de puntos críticos y una propuesta de implementación.
+  </p>
+  <div class="cta-actions reveal">
+    <a href="mailto:hola@iotoday.com.ar" class="btn-primary">Solicitar diagnóstico gratis</a>
+    <a href="tel:+5491100000000" class="btn-ghost">Llamar ahora</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Io<span>Today</span></a>
+  <div class="footer-copy">© 2025 IoToday — Buenos Aires, Argentina</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
